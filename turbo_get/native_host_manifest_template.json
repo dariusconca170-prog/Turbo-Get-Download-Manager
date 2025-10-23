@@ -1,0 +1,9 @@
+{
+  "name": "io.github.dariusconca170-prog.turboget",
+  "description": "Connects browsers to the TurboGet Download Manager.",
+  "path": "__PATH__",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://iofilpaclhifkjgnbeinnjbhkoenfefa/"
+  ]
+}

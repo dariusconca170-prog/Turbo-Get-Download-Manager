@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+venv/
+.venv/
+env/
+ENV/
+
+.idea/
+.vscode/
+
+turbo_get/io.github.dariusconca170-prog.turboget.json
