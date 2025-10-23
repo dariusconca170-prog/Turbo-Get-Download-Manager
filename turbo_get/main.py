@@ -1,4 +1,3 @@
-# turbo_get/main.py
 """
 TurboGet - Advanced Multi-threaded Download Manager
 GUI, App Entry Point, and Native Messaging Web Server
@@ -11,12 +10,8 @@ import threading
 import time
 from datetime import datetime, timedelta
 from typing import Dict, Optional
-
-# --- New Imports for Web Server ---
 from aiohttp import web
 import aiohttp
-
-# --- Local Modular Imports ---
 from engine import DownloadEngine
 from graph import SpeedGraph
 from utils import format_bytes, is_valid_url, get_default_filename
@@ -106,13 +101,11 @@ class TurboGetGUI:
         self.eta_label = ttk.Label(progress_frame, text="ETA: --")
         self.eta_label.pack(anchor=tk.W)
 
-        # Speed Graph
         graph_frame = ttk.LabelFrame(main_frame, text="Speed Monitor", padding="10")
         graph_frame.pack(fill=tk.BOTH, expand=True, pady=5)
         self.speed_graph = SpeedGraph(graph_frame)
         self.speed_graph.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-        # Status Log
         log_frame = ttk.LabelFrame(main_frame, text="Status Log", padding="10")
         log_frame.pack(fill=tk.X, pady=5)
         self.log_text = tk.Text(log_frame, height=6, bg='#1e1e1e', fg='#00ff00', font=('Consolas', 9), relief=tk.FLAT)
@@ -121,19 +114,15 @@ class TurboGetGUI:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.log_text['yscrollcommand'] = scrollbar.set
 
-    # --- Web Server Methods ---
-
     async def handle_add_download(self, request):
         """Web handler to receive a download URL from the native host."""
         try:
             data = await request.json()
             url = data.get("url")
             if url:
-                # Use root.after to safely update the GUI from this async thread
                 self.root.after(0, self.on_url_detected, url)
                 return web.Response(text="URL received")
         except Exception as e:
-            # Log the error for debugging
             self.root.after(0, self.log, f"Web server error: {e}")
             return web.Response(text=f"Error: {e}", status=500)
         return web.Response(text="Invalid request", status=400)
@@ -144,7 +133,7 @@ class TurboGetGUI:
         app.router.add_post('/add_download', self.handle_add_download)
         self.web_runner = web.AppRunner(app)
         await self.web_runner.setup()
-        site = web.TCPSite(self.web_runner, '127.0.0.1', 9876) # Port 9876
+        site = web.TCPSite(self.web_runner, '127.0.0.1', 9876) 
         await site.start()
         self.log("Browser integration server started on port 9876.")
 
@@ -153,8 +142,6 @@ class TurboGetGUI:
         if self.web_runner:
             await self.web_runner.cleanup()
             self.log("Browser integration server stopped.")
-
-    # --- GUI Event Handlers and Callbacks ---
 
     def browse_file(self):
         filename = filedialog.asksaveasfilename(title="Save file as", defaultextension=".*")
@@ -245,7 +232,6 @@ class TurboGetGUI:
         if default_filename:
             self.path_entry.delete(0, tk.END)
             self.path_entry.insert(0, default_filename)
-        # Bring window to front
         self.root.lift()
         self.root.attributes('-topmost', True)
         self.root.after(100, lambda: self.root.attributes('-topmost', False))
@@ -269,12 +255,9 @@ class TurboGetGUI:
         self.resume_button.config(state=tk.NORMAL if is_running and is_paused else tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL if is_running else tk.DISABLED)
 
-    # --- Application Lifecycle ---
-
     def run(self):
         """Run the application main loop and start background services."""
         self.log("TurboGet Advanced Download Manager initialized.")
-        # Start the background web server in a separate thread
         threading.Thread(target=lambda: asyncio.run(self.start_web_server()), daemon=True).start()
         self.root.mainloop()
 
@@ -286,7 +269,6 @@ class TurboGetGUI:
         
         self.stop_download()
         if self.web_runner:
-            # Running the async stop function in a blocking way for shutdown
             asyncio.run(self.stop_web_server())
         
         self.root.destroy()
